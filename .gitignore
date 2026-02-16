@@ -13,3 +13,8 @@ build/
 
 # macOS
 .DS_Store
+
+# One-time migration from old Supabase app (NextWorkout)
+migration/
+LastLift/LastLift/seed.json
+LastLift/LastLift/Utilities/DataImporter.swift
