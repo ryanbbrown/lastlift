@@ -1,6 +1,7 @@
 import SwiftUI
 import SwiftData
 
+/// Chronological list of all recorded workouts with swipe-to-delete
 struct WorkoutHistoryView: View {
     @Environment(\.modelContext) private var modelContext
     @Query(sort: \Workout.workoutDate, order: .reverse) private var workouts: [Workout]
@@ -33,17 +34,12 @@ struct WorkoutHistoryView: View {
             }
             .confirmationDialog(
                 "Delete Workout?",
-                isPresented: Binding(get: { workoutToDelete != nil }, set: { if !$0 { workoutToDelete = nil } }),
+                isPresented: $workoutToDelete.isPresent(),
                 titleVisibility: .visible
             ) {
                 Button("Delete", role: .destructive) {
                     if let workout = workoutToDelete {
-                        let affectedExercises = workout.workoutExercises.compactMap(\.exercise)
-                        modelContext.delete(workout)
-                        try? modelContext.save()
-                        for exercise in affectedExercises {
-                            exercise.recalculateLastPerformed()
-                        }
+                        workout.deleteAndRecalculate(from: modelContext)
                         UIImpactFeedbackGenerator(style: .medium).impactOccurred()
                     }
                     workoutToDelete = nil

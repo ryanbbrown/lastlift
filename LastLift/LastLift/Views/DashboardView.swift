@@ -1,6 +1,7 @@
 import SwiftUI
 import SwiftData
 
+/// Home tab showing prioritized exercises from each group
 struct DashboardView: View {
     @Query(sort: \ExerciseGroup.createdAt) private var groups: [ExerciseGroup]
     @State private var showRecordWorkout = false

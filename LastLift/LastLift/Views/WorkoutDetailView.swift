@@ -1,6 +1,7 @@
 import SwiftUI
 import SwiftData
 
+/// Detail view for viewing and editing a single workout
 struct WorkoutDetailView: View {
     @Environment(\.modelContext) private var modelContext
     @Environment(\.dismiss) private var dismiss
@@ -100,12 +101,7 @@ struct WorkoutDetailView: View {
 
     /// Deletes the entire workout and recalculates lastPerformed on all affected exercises
     private func deleteWorkout() {
-        let affectedExercises = workout.workoutExercises.compactMap { $0.exercise }
-        modelContext.delete(workout)
-        try? modelContext.save()
-        for exercise in affectedExercises {
-            exercise.recalculateLastPerformed()
-        }
+        workout.deleteAndRecalculate(from: modelContext)
         UIImpactFeedbackGenerator(style: .medium).impactOccurred()
         dismiss()
     }

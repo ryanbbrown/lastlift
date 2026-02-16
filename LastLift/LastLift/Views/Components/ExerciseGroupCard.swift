@@ -1,5 +1,6 @@
 import SwiftUI
 
+/// Expandable card displaying a group's prioritized exercises on the dashboard
 struct ExerciseGroupCard: View {
     let group: ExerciseGroup
     let exercises: [Exercise]
@@ -21,7 +22,7 @@ struct ExerciseGroupCard: View {
         }
         .tint(Color(hex: group.color))
         .padding()
-        .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 12))
+        .background(.black, in: RoundedRectangle(cornerRadius: 12))
         .overlay(
             RoundedRectangle(cornerRadius: 12)
                 .stroke(Color(hex: group.color).opacity(0.5), lineWidth: 1)
@@ -44,7 +45,7 @@ private struct ExerciseRow: View {
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(8)
-        .background(Color(.systemGray6), in: RoundedRectangle(cornerRadius: 8))
+        .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 8))
         .accessibilityIdentifier("exerciseRow_\(exercise.name)")
     }
 

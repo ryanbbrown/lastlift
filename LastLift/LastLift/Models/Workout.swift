@@ -17,4 +17,14 @@ final class Workout {
         self.createdAt = Date()
         self.updatedAt = Date()
     }
+
+    /// Deletes this workout and recalculates lastPerformed on all affected exercises
+    func deleteAndRecalculate(from context: ModelContext) {
+        let affectedExercises = workoutExercises.compactMap(\.exercise)
+        context.delete(self)
+        try? context.save()
+        for exercise in affectedExercises {
+            exercise.recalculateLastPerformed()
+        }
+    }
 }

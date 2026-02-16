@@ -63,7 +63,7 @@ struct GroupDetailView: View {
         }
         .confirmationDialog(
             "Delete \(exerciseToDelete?.name ?? "Exercise")?",
-            isPresented: Binding(get: { exerciseToDelete != nil }, set: { if !$0 { exerciseToDelete = nil } }),
+            isPresented: $exerciseToDelete.isPresent(),
             titleVisibility: .visible
         ) {
             Button("Delete", role: .destructive) {

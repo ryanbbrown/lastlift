@@ -1,6 +1,7 @@
 import SwiftUI
 import SwiftData
 
+/// Sheet for recording a new workout by selecting exercises and set counts
 struct RecordWorkoutView: View {
     @Environment(\.modelContext) private var modelContext
     @Environment(\.dismiss) private var dismiss
@@ -113,7 +114,7 @@ struct RecordWorkoutView: View {
             let workoutExercise = WorkoutExercise(sets: selected.sets, workout: workout, exercise: selected.exercise)
             modelContext.insert(workoutExercise)
 
-            if selected.exercise.lastPerformed == nil || workoutDate > selected.exercise.lastPerformed! {
+            if selected.exercise.lastPerformed.map({ workoutDate > $0 }) ?? true {
                 selected.exercise.lastPerformed = workoutDate
                 selected.exercise.updatedAt = Date()
             }

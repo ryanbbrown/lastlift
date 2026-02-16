@@ -1,5 +1,6 @@
 import SwiftUI
 
+/// Root tab view containing Dashboard, Workouts, and Exercises tabs
 struct HomeView: View {
     var body: some View {
         TabView {
