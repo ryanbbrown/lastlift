@@ -6,12 +6,15 @@ struct ExerciseGroupCard: View {
     let exercises: [Exercise]
 
     @State private var isExpanded = true
+    @State private var exerciseToSkip: Exercise?
 
     var body: some View {
         DisclosureGroup(isExpanded: $isExpanded) {
             LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 8) {
                 ForEach(exercises) { exercise in
-                    ExerciseRow(exercise: exercise)
+                    ExerciseCardRow(exercise: exercise) {
+                        exerciseToSkip = exercise
+                    }
                 }
             }
             .padding(.top, 4)
@@ -28,31 +31,60 @@ struct ExerciseGroupCard: View {
                 .stroke(Color(hex: group.color).opacity(0.5), lineWidth: 1)
         )
         .accessibilityIdentifier("exerciseGroupCard_\(group.name)")
+        .confirmationDialog(
+            "Skip \(exerciseToSkip?.name ?? "Exercise")?",
+            isPresented: $exerciseToSkip.isPresent(),
+            titleVisibility: .visible
+        ) {
+            Button("Skip") {
+                if let exercise = exerciseToSkip {
+                    exercise.lastSkippedAt = Date()
+                    UIImpactFeedbackGenerator(style: .medium).impactOccurred()
+                }
+                exerciseToSkip = nil
+            }
+        } message: {
+            Text("This exercise will move to the back of the queue.")
+        }
     }
 }
 
-private struct ExerciseRow: View {
+private struct ExerciseCardRow: View {
     let exercise: Exercise
+    let onSkip: () -> Void
+    @AppStorage("dateFormat") private var dateFormat: DateFormatSetting = .relative
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 2) {
-            Text(exercise.name)
-                .font(.subheadline)
-                .fontWeight(.medium)
-            Text(relativeDate)
-                .font(.caption)
-                .foregroundStyle(.secondary)
+        Button(action: onSkip) {
+            VStack(alignment: .leading, spacing: 2) {
+                Text(exercise.name)
+                    .font(.subheadline)
+                    .fontWeight(.medium)
+                Text(dateLabel)
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(8)
+            .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 8))
         }
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .padding(8)
-        .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 8))
+        .buttonStyle(.plain)
         .accessibilityIdentifier("exerciseRow_\(exercise.name)")
     }
 
-    private var relativeDate: String {
+    private var dateLabel: String {
+        let wasSkipped = exercise.lastSkippedAt.map { skipDate in
+            exercise.lastPerformed.map { skipDate > $0 } ?? true
+        } ?? false
+
+        if wasSkipped {
+            if let date = exercise.lastSkippedAt {
+                return dateFormat.format(date) + " (skipped)"
+            }
+            return "Never"
+        }
+
         guard let date = exercise.lastPerformed else { return "Never" }
-        let formatter = RelativeDateTimeFormatter()
-        formatter.unitsStyle = .full
-        return formatter.localizedString(for: date, relativeTo: .now)
+        return dateFormat.format(date)
     }
 }

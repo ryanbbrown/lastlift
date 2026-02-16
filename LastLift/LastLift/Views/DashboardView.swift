@@ -5,6 +5,7 @@ import SwiftData
 struct DashboardView: View {
     @Query(sort: \ExerciseGroup.createdAt) private var groups: [ExerciseGroup]
     @State private var showRecordWorkout = false
+    @State private var showSettings = false
 
     var body: some View {
         NavigationStack {
@@ -29,6 +30,15 @@ struct DashboardView: View {
             }
             .navigationTitle("LastLift")
             .toolbar {
+                ToolbarItem(placement: .topBarLeading) {
+                    Button {
+                        showSettings = true
+                    } label: {
+                        Image(systemName: "gearshape")
+                    }
+                    .accessibilityLabel("Settings")
+                    .accessibilityIdentifier("settingsButton")
+                }
                 ToolbarItem(placement: .primaryAction) {
                     Button {
                         showRecordWorkout = true
@@ -38,6 +48,9 @@ struct DashboardView: View {
                     .accessibilityLabel("Record Workout")
                     .accessibilityIdentifier("recordWorkoutButton")
                 }
+            }
+            .sheet(isPresented: $showSettings) {
+                SettingsView()
             }
             .sheet(isPresented: $showRecordWorkout) {
                 RecordWorkoutView()

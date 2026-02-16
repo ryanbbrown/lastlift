@@ -116,6 +116,7 @@ struct RecordWorkoutView: View {
 
             if selected.exercise.lastPerformed.map({ workoutDate > $0 }) ?? true {
                 selected.exercise.lastPerformed = workoutDate
+                selected.exercise.lastSkippedAt = nil
                 selected.exercise.updatedAt = Date()
             }
         }

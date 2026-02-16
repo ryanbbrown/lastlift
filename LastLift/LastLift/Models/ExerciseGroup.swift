@@ -20,18 +20,20 @@ final class ExerciseGroup {
         self.updatedAt = Date()
     }
 
-    /// Returns exercises sorted by longest gap since last performed, limited to numExercisesToShow
+    /// Returns exercises sorted by longest gap since last activity (performed or skipped), limited to numExercisesToShow
     var prioritizedExercises: [Exercise] {
         let sorted = exercises.sorted { a, b in
-            switch (a.lastPerformed, b.lastPerformed) {
+            let dateA = [a.lastPerformed, a.lastSkippedAt].compactMap { $0 }.max()
+            let dateB = [b.lastPerformed, b.lastSkippedAt].compactMap { $0 }.max()
+            switch (dateA, dateB) {
             case (nil, nil):
                 return a.name < b.name
             case (nil, _):
                 return true
             case (_, nil):
                 return false
-            case let (dateA?, dateB?):
-                return dateA < dateB
+            case let (dA?, dB?):
+                return dA < dB
             }
         }
         return Array(sorted.prefix(numExercisesToShow))

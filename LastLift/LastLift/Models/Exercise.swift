@@ -6,6 +6,7 @@ final class Exercise {
     var name: String
     var exerciseDescription: String
     var lastPerformed: Date?
+    var lastSkippedAt: Date?
     var createdAt: Date
     var updatedAt: Date
 

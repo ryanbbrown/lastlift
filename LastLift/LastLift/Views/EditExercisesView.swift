@@ -17,6 +17,14 @@ struct EditExercisesView: View {
                     NavigationLink(value: group) {
                         GroupRow(group: group)
                     }
+                    .swipeActions(edge: .leading) {
+                        Button {
+                            groupToEdit = group
+                        } label: {
+                            Label("Edit", systemImage: "pencil")
+                        }
+                        .tint(Color(hex: group.color))
+                    }
                     .accessibilityIdentifier("group-row-\(group.name)")
                 }
                 .onDelete(perform: confirmDeleteGroup)
@@ -37,6 +45,9 @@ struct EditExercisesView: View {
             }
             .sheet(isPresented: $showingAddGroup) {
                 EditGroupSheet(group: nil)
+            }
+            .sheet(item: $groupToEdit) { group in
+                EditGroupSheet(group: group)
             }
             .overlay {
                 if groups.isEmpty {

@@ -11,6 +11,7 @@ struct GroupDetailView: View {
     @State private var exerciseToEdit: Exercise?
     @State private var showingAddExercise = false
     @State private var exerciseToDelete: Exercise?
+    @State private var showingEditGroup = false
 
     init(group: ExerciseGroup) {
         self.group = group
@@ -31,10 +32,13 @@ struct GroupDetailView: View {
                 } label: {
                     ExerciseRow(exercise: exercise)
                 }
+                .buttonStyle(.plain)
+                .listRowBackground(Color.clear)
                 .accessibilityIdentifier("exercise-row-\(exercise.name)")
             }
             .onDelete(perform: confirmDeleteExercise)
         }
+        .scrollContentBackground(.hidden)
         .overlay {
             if exercises.isEmpty {
                 ContentUnavailableView {
@@ -46,13 +50,31 @@ struct GroupDetailView: View {
         }
         .navigationTitle(group.name)
         .toolbar {
-            ToolbarItem(placement: .primaryAction) {
-                Button {
-                    showingAddExercise = true
-                } label: {
-                    Image(systemName: "plus")
+            ToolbarItem(placement: .principal) {
+                HStack(spacing: 8) {
+                    RoundedRectangle(cornerRadius: 2)
+                        .fill(Color(hex: group.color))
+                        .frame(width: 4, height: 20)
+                    Text(group.name)
+                        .font(.headline)
                 }
-                .accessibilityIdentifier("add-exercise-button")
+            }
+            ToolbarItem(placement: .primaryAction) {
+                HStack(spacing: 12) {
+                    Button {
+                        showingEditGroup = true
+                    } label: {
+                        Image(systemName: "pencil")
+                    }
+                    .accessibilityLabel("Edit Group")
+
+                    Button {
+                        showingAddExercise = true
+                    } label: {
+                        Image(systemName: "plus")
+                    }
+                    .accessibilityIdentifier("add-exercise-button")
+                }
             }
         }
         .sheet(item: $exerciseToEdit) { exercise in
@@ -60,6 +82,9 @@ struct GroupDetailView: View {
         }
         .sheet(isPresented: $showingAddExercise) {
             EditExerciseSheet(group: group, exercise: nil)
+        }
+        .sheet(isPresented: $showingEditGroup) {
+            EditGroupSheet(group: group)
         }
         .confirmationDialog(
             "Delete \(exerciseToDelete?.name ?? "Exercise")?",
@@ -83,7 +108,7 @@ struct GroupDetailView: View {
     }
 }
 
-/// Row displaying an exercise's name and description
+/// Row displaying an exercise's name and description with card styling
 private struct ExerciseRow: View {
     let exercise: Exercise
 
@@ -97,5 +122,8 @@ private struct ExerciseRow: View {
                     .foregroundStyle(.secondary)
             }
         }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(10)
+        .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 10))
     }
 }
