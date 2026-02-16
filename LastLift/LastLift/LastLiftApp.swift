@@ -1,10 +1,3 @@
-//
-//  LastLiftApp.swift
-//  LastLift
-//
-//  Created by Ryan Brown on 2/15/26.
-//
-
 import SwiftUI
 import SwiftData
 
@@ -12,9 +5,13 @@ import SwiftData
 struct LastLiftApp: App {
     var sharedModelContainer: ModelContainer = {
         let schema = Schema([
-            Item.self,
+            ExerciseGroup.self,
+            Exercise.self,
+            Workout.self,
+            WorkoutExercise.self,
         ])
-        let modelConfiguration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false)
+        let inMemory = CommandLine.arguments.contains("--reset-data")
+        let modelConfiguration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: inMemory)
 
         do {
             return try ModelContainer(for: schema, configurations: [modelConfiguration])
@@ -25,7 +22,8 @@ struct LastLiftApp: App {
 
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            HomeView()
+                .preferredColorScheme(.dark)
         }
         .modelContainer(sharedModelContainer)
     }
